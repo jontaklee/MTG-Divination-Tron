@@ -16,8 +16,9 @@ This program only takes into account starting hands that can guarantee assemblin
 
 Determining whether to mulligan hands that do not immediately achieve Tron requires simulated games involving those starting hands.
 
+The vancouver.py script simulates playing until all three Tron lands are in play, and outputs the starting hand and turn when Tron was achieved. Methods for each card and the deck are found in the card_classes.py file.
 
-This is currently a work in progress. 
+This is currently a work in progress. Future work will involve training a machine learning model to predict the turn at which a hand achieves Tron, to make optimal mulligan decisions. This will also be used to compare the success rate between the Vancouver and London mulligans for all hands, rather than just those that start with Tron in the starting hand.
 
 
 
