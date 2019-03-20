@@ -1,13 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 v1.0
 # -*- coding: utf-8 -*-
 """
 Simulate hands using the Vancouver mulligan
 
 Returns turn on which Tron is achieved
 """
+import numpy as np
 
 import card_classes
 from card_classes import TronDeck, Chromatic
+from mulligan_sim import eval_tron_hand
 
 # simulates the vancouver mulligan scry rule
 def vancouver_scry(library, hand):
@@ -41,11 +43,17 @@ def vancouver_scry(library, hand):
         if len(g_sources.intersection(set(names))) > 0:
             top = True
         
+        else:
+            top = False
+        
     # only keep Star/Sphere if hand contains Scrying/Stirrings but no green source
     elif temp.name == 'Chromatic Star' or temp.name == 'Chromatic Sphere':
         if 'Sylvan Scrying' in names or 'Ancient Stirrings' in names \
         and len(g_sources.intersection(set(names))) == 0:
             top = True
+        
+        else: 
+            top = False
                 
     # bottom everything else
     else: 
@@ -131,18 +139,23 @@ def sim_turn(hand, deck, bfield):
                 manapool += 1
                 if card.name == 'Forest':
                     g_mana += 1
-                break                      
+                break          
+            
 
 def sim_magic(handsize, on_draw):
     '''
     handsize: starting handsize (int)
-    on_draw: boolean
+    on_draw: booleansim_
     '''
     library = TronDeck()
     bfield = []
     
     hand = library.draw_opener(handsize)
     starting_hand = [card.name for card in hand]
+    
+    turn3 = eval_tron_hand(hand, len(hand))
+    if turn3:
+        return (starting_hand, 3)
     
     if handsize < 7:
         vancouver_scry(library, hand)
@@ -167,4 +180,13 @@ def sim_magic(handsize, on_draw):
         turn += 1
     
     return (starting_hand, turn)
+
+
+def estimate_turns(handsize, on_draw):
+    turns = []
+    for n in range(10000):
+        res = sim_magic(handsize, on_draw)
+        turns.append(res[1])
+    return np.mean(turns), np.std(turns)
+
                 
