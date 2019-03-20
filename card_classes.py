@@ -24,18 +24,10 @@ class Land(MagicCard):
         self.name = name
         self.basic = basic
         MagicCard.__init__(self, name, 0, 'land', True, 0)
-
-# dictionary of Tron lands, with keys as card names, for other functions       
-def tron_dict():
-    tower = Land('Urza\'s Tower', False)
-    mine = Land('Urza\'s Mine', False)
-    pplant = Land('Urza\'s Power Plant', False)
-    return {tower.name:tower, mine.name:mine, pplant.name:pplant}
-
-
-# stored as a global variable to match object location across functions
-Tron_dic = tron_dict()
-
+    
+    def play(self, hand, bfield):
+        bfield.append(self)
+        hand.pop(hand.index(self))
         
 # class to simulate casting Ancient Stirrings
 class AncientStirrings(MagicCard):
@@ -45,11 +37,11 @@ class AncientStirrings(MagicCard):
 
     def cast(self, hand, deck, bfield):
         
-        global manapool, g_mana
-        tron_set = set(Tron_dic.keys())
-        
+        tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
+        bfield_names = [card.name for card in bfield]
+
         # determine which lands are still needed for Tron
-        tron_needed = tron_set.difference(set(bfield))
+        tron_needed = tron_set.difference(set(bfield_names))
         
         # look at the top five cards of the deck
         temp = deck.deck[:5]
@@ -65,9 +57,9 @@ class AncientStirrings(MagicCard):
         temp_names = [card.name for card in temp]
 
         # coded to prioritize achieving Tron over all else
-        priority = ['Expedition Map', 'Chromatic Star', 'Chromatic Sphere', 
+        priority = ('Expedition Map', 'Chromatic Star', 'Chromatic Sphere', 
                     'Forest', 'Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant',
-                    'Sanctum of Ugin', 'Ghost Quarter']
+                    'Sanctum of Ugin', 'Ghost Quarter')
         
         if len(temp) == 5:
             for name in priority:
@@ -80,11 +72,9 @@ class AncientStirrings(MagicCard):
         del deck.deck[:5]
         
         # put the remaining 4 cards on the bottom of the deck
-        deck.deck.extend(temp) 
+        deck.deck.extend(temp)
         
-        manapool -= 1
-        g_mana -= 1
-        
+        hand.pop(hand.index(self))
         
 # class to simulate casting and activating Chromatic Star/Sphere
 class Chromatic(MagicCard):
@@ -95,15 +85,12 @@ class Chromatic(MagicCard):
         MagicCard.__init__(self, name, 1, 'artifact', True, 0)
         
     def cast(self, hand, deck, bfield):
-        global manapool
         bfield.append(self)
-        manapool -= 1
+        hand.pop(hand.index(self))
     
     def ability(self, hand, deck, bfield):
-        global manapool, g_mana
         deck.draw(hand)
         bfield.pop(bfield.index(self))
-        g_mana += 1
         
 
 # class to simulate casting and activating Relic of Progenitus
@@ -114,32 +101,38 @@ class Relic(MagicCard):
         MagicCard.__init__(self, 'Relic of Progenitus', 1, 'artifact', True, 0)
         
     def cast(self, hand, deck, bfield):
-        global manapool
         bfield.append(self)
-        manapool -= self.amc
-        
+        hand.pop(hand.index(self))
+   
     def ability(self, hand, deck, bfield):
-        global manapool
         deck.draw(hand)
         bfield.pop(bfield.index(self))
-        manapool -= 1
 
    
     
 # helper function for Sylvan Scrying and Expedition Map
 def tron_tutor(hand, deck, bfield):
     
-    tron_set = set(Tron_dic.keys())
+    tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
+    bfield_names = [card.name for card in bfield]
     
     # determine which Tron lands are still needed
-    tron_needed = list(tron_set.difference(set(bfield)))
+    tron_needed = list(tron_set.difference(set(bfield_names)))
     hand_names = [card.name for card in hand]
     
     # move a Tron land from deck to hand (only tutors Tron lands)
     for name in tron_needed:
         if name not in hand_names:
-            hand.append(Tron_dic.get(name))
-            deck.deck.pop(deck.deck.index(Tron_dic.get(name)))
+            names_deck = [card.name for card in deck.deck]
+            
+            # position of the card in the deck
+            card_pos = names_deck.index(name)
+            
+            # add the selected card to hand
+            hand.append(deck.deck[card_pos])
+            
+            # delete the card from the deck
+            deck.deck.pop(card_pos)
             break
           
     deck.shuffle()
@@ -152,11 +145,8 @@ class SylvanScrying(MagicCard):
         MagicCard.__init__(self, 'Sylvan Scrying', 2, 'sorcery', False, 1)
         
     def cast(self, hand, deck, bfield):
-        
-        global manapool, g_mana
         tron_tutor(hand, deck, bfield)
-        manapool -= self.cmc
-        g_mana -= 1
+        hand.pop(hand.index(self))
         
         
 # class to simulate casting and activating Expedition Map  
@@ -166,23 +156,21 @@ class ExpMap(MagicCard):
         self.amc = 2
         MagicCard.__init__(self, 'Expedition Map', 1, 'artifact', False, 0)
         
-    def cast(self, bfield):
-        
-        global manapool
+    def cast(self, hand, deck, bfield):
         bfield.append(self)
-        manapool -= self.amc
+        hand.pop(hand.index(self))
     
     def ability(self, hand, deck, bfield):
-        
-        global manapool
         tron_tutor(hand, deck, bfield)
         bfield.pop(bfield.index(self))
-        manapool -= 2
-
 
 
 # generates a Tron decklist
-def decklist(tron_dict):
+def decklist():
+    
+    tower = Land('Urza\'s Tower', False)
+    mine = Land('Urza\'s Mine', False)
+    pplant = Land('Urza\'s Power Plant', False)
     
     sanctum = Land('Sanctum of Ugin', False)
     gq = Land('Ghost Quarter', False)
@@ -203,7 +191,7 @@ def decklist(tron_dict):
     sphere = Chromatic('Chromatic Sphere')
     relic = Relic()
     
-    tron_lands = list(tron_dict.values())*4
+    tron_lands = [tower, mine, pplant]*4
     
     quads = [karn, wurmcoil, ostone, emap, stirrings, scrying, star, sphere]*4
     trips = [relic]*3
@@ -217,8 +205,8 @@ def decklist(tron_dict):
 # class to simulate the library as a stack
 class TronDeck:
     
-    def __init__(self, Tron_dic):
-        self.deck = decklist(Tron_dic)
+    def __init__(self):
+        self.deck = decklist()
     
     def shuffle(self):
         for i in range(0,5):
@@ -238,13 +226,3 @@ class TronDeck:
     def scry_bottom(self):
         self.deck.append(self.deck[0])
         del self.deck[0]
-
-'''
-def main():
-    d = TronDeck()
-'''
-
-
-
-
-

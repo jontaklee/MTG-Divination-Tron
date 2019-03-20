@@ -7,18 +7,16 @@ Returns turn on which Tron is achieved
 """
 
 import card_classes
-from card_classes import tron_dict, TronDeck
+from card_classes import TronDeck, Chromatic
 
+# simulates the vancouver mulligan scry rule
 def vancouver_scry(library, hand):
     
-    if len(hand) == 7:
-        return
-    
-    temp = library[0]
+    temp = library.deck[0]
     names = [card.name for card in hand]
     
     # determine which Tron lands aren't in the starting hand
-    tron_set = set(Tron_dic.keys())
+    tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
     tron_needed = tron_set.difference(set(names))
     
     num_lands = [card.card_type for card in hand].count('land')
@@ -55,110 +53,118 @@ def vancouver_scry(library, hand):
     
     if top is False:
         library.scry_bottom()
-
-
-def play_land(card, hand, bfield):
     
-    global manapool, g_mana, land_drop
-    
-    bfield.append(card)
-    hand.pop(hand.index(card))
-    manapool += 1
-    
-    if card.name == 'Forest':
-        g_mana += 1
-    
-    land_drop = True
-    
-
-def sim_turn(hand, deck, bfield, tron_set):
+def sim_turn(hand, deck, bfield):
         
     manapool = [card.card_type for card in bfield].count('land')
     g_mana = [card.name for card in bfield].count('Forest')
-    
-    hand_names = [card.name for card in hand]
-    
-    bfield_names = [card.name for card in bfield]
-        
-    tron_needed = tron_set.difference(set(bfield))
+
     land_drop = False
-    
     plays = True
+    
+    # continue until no plays are available
     while plays:
         plays = False
         
-        priority = [('Expedition Map', 'ability'), ('Sylvan Scrying', 'cast'), 
+        hand_names = [card.name for card in hand]
+        bfield_names = [card.name for card in bfield]
+        
+        tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
+        tron_needed = tron_set.difference(set(bfield))
+        
+        priority = (('Expedition Map', 'ability'), ('Sylvan Scrying', 'cast'), 
                     ('Expedition Map', 'cast'), ('Ancient Stirrings', 'cast'),
                     ('Chromatic Star', 'ability'), ('Chromatic Sphere', 'ability'),
                     ('Chromatic Star', 'cast'), ('Chromatic Sphere', 'cast'),
                     ('Relic of Progenitus', 'ability'), ('Relic of Progenitus', 'cast'),
-                    ('Forest', 'play'), ('Ghost Quarter', 'play'), ('Sanctum of Ugin', 'play')]
+                    ('Forest', 'play'), ('Ghost Quarter', 'play'), ('Sanctum of Ugin', 'play'),
+                    ('Urza\'s Tower', 'play'), ('Urza\'s Mine', 'play'), ('Urza\'s Power Plant', 'play'))
         
         # play a tron land from hand if already available
         for card_name in list(tron_needed):
             if card_name in hand_names and land_drop is False:
                 card = hand[hand_names.index(card_name)]
-                play_land(card, hand, bfield)
+                card.play(hand, bfield)
+                
+                #update hand names and remaining tron pieces needed
+                hand_names.pop(hand_names.index(card_name))
+                tron_needed = tron_set.difference(set(bfield))
+                
+                manapool += 1
+                land_drop = True
                 break
         
         # play a card and return to the top of the loop 
-        for card_name in priority:
-            field = card_name[1]
+        for card in priority:
             
-            if field == 'ability' and card_name[0] in bfield:
-                card = bfield[bfield_names.index(card_name)]
+            field = card[1]
+            name = card[0]
+            
+            # for activated abilities of cards in play
+            if field == 'ability' and name in bfield_names:
+                card = bfield[bfield_names.index(name)]
                 if manapool >= card.amc:
                     card.ability(hand, deck, bfield)
+                    manapool -= card.amc
+                    if type(card) == Chromatic:
+                        manapool += 1
+                        g_mana += 1
                     plays = True
                     break
             
-            if field == 'cast' and card_name[0] in hand:
-                card = hand[hand_names.index(card_name)]
+            # for casting a spell in hand
+            if field == 'cast' and name in hand_names:
+                card = hand[hand_names.index(name)]
                 if manapool >= card.cmc and g_mana >= card.gmc:
                     card.cast(hand, deck, bfield)
+                    manapool -= card.cmc
+                    g_mana -= card.gmc
                     plays = True
                     break
             
-            if field == 'play' and card_name[0] in hand and land_drop is False:
-                card = hand[hand_names.index(card_name)]
-                play_land(card, hand, bfield)
+            # for playing a land that's not a missing Tron land (last option)
+            if field == 'play' and name in hand_names and land_drop is False:
+                card = hand[hand_names.index(name)]
+                card.play(hand, bfield)
                 plays = True
-                break
-                         
-            
-def sim_magic():
-    
-    on_draw = True
-    handsize = 7
-    
-    Tron_dic = tron_dict()
-    library = TronDeck(Tron_dic)
+                land_drop = True
+                manapool += 1
+                if card.name == 'Forest':
+                    g_mana += 1
+                break                      
+
+def sim_magic(handsize, on_draw):
+    '''
+    handsize: starting handsize (int)
+    on_draw: boolean
+    '''
+    library = TronDeck()
     bfield = []
     
     hand = library.draw_opener(handsize)
-    starting_hand = hand
+    starting_hand = [card.name for card in hand]
     
     if handsize < 7:
         vancouver_scry(library, hand)
     
-    tron_set = set(Tron_dic.keys())
+    tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
     tron_achieved = False
     
     turn = 0
-
+    
+    # simulates playing until Tron is in play
     while tron_achieved is False:
         
         if on_draw or turn != 0:
             library.draw(hand)
-        sim_turn(hand, library, bfield, tron_set)
+            
+        sim_turn(hand, library, bfield)
+        bfield_names = [card.name for card in bfield]
         
-        if len(tron_set.difference(set(bfield))) == 0:
+        if len(tron_set.difference(set(bfield_names))) == 0:
             tron_achieved = True
             
         turn += 1
     
     return (starting_hand, turn)
-    
-    
-        
                 
