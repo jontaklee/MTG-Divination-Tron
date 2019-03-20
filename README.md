@@ -1,6 +1,6 @@
 # Modern-Tron-Mulligans
 
-*a Magic the Gathering simulator*
+A *Magic the Gathering* Simulator
 
 The Modern Tron deck relies on assembling Urza's Mine, Urza's Tower, and Urza's Power Plant in play as 
 early as possible. This combination, termed 'Tron', is ideally achieved by the third or fourth turn of the game.
@@ -27,4 +27,4 @@ Future work will involve training a machine learning model to predict the turn a
 
 
 
-Magic: The Gathering is property of Hasbro
+*Magic: The Gathering* is property of Hasbro
