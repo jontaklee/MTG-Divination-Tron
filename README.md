@@ -1,6 +1,6 @@
 # Modern-Tron-Mulligans
 
-*Magic the Gathering simulator*
+*a Magic the Gathering simulator*
 
 The Modern Tron deck relies on assembling Urza's Mine, Urza's Tower, and Urza's Power Plant in play as 
 early as possible. This combination, termed 'Tron', is ideally achieved by the third or fourth turn of the game.
