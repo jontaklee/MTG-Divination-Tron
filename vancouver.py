@@ -78,7 +78,7 @@ def sim_turn(hand, deck, bfield):
         bfield_names = [card.name for card in bfield]
         
         tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
-        tron_needed = tron_set.difference(set(bfield))
+        tron_needed = tron_set.difference(set(bfield_names))
         
         priority = (('Expedition Map', 'ability'), ('Sylvan Scrying', 'cast'), 
                     ('Expedition Map', 'cast'), ('Ancient Stirrings', 'cast'),
@@ -145,17 +145,13 @@ def sim_turn(hand, deck, bfield):
 def sim_magic(handsize, on_draw):
     '''
     handsize: starting handsize (int)
-    on_draw: booleansim_
+    on_draw: boolean
     '''
     library = TronDeck()
     bfield = []
     
     hand = library.draw_opener(handsize)
     starting_hand = [card.name for card in hand]
-    
-    turn3 = eval_tron_hand(hand, len(hand))
-    if turn3:
-        return (starting_hand, 3)
     
     if handsize < 7:
         vancouver_scry(library, hand)
@@ -182,11 +178,29 @@ def sim_magic(handsize, on_draw):
     return (starting_hand, turn)
 
 
-def estimate_turns(handsize, on_draw):
-    turns = []
-    for n in range(10000):
-        res = sim_magic(handsize, on_draw)
-        turns.append(res[1])
-    return np.mean(turns), np.std(turns)
+def estimate_turns(on_draw):
+    # on_draw -- True/False
+    
+    for i in range(7, 2, -1):
+        turns = []
+        for n in range(10000):
+            res = sim_magic(i, on_draw)
+            turns.append(res[1])
+        #return np.mean(turns), np.std(turns)
+        print(i, 'card hand:', np.mean(turns), 'turns')
 
-                
+
+def main():
+    draw = input('on the draw? y/n: ')
+    print('simulating hands:')
+    if draw == 'y':
+        estimate_turns(True)
+    elif draw == 'n':
+        estimate_turns(False)
+    else:
+        raise ValueError('input must be y/n')
+    
+    
+if __name__ == '__main__':
+    main()
+              
