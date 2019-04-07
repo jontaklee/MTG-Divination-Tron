@@ -1,13 +1,15 @@
 # Modern-Tron-Mulligans
 
 A *Magic the Gathering* Simulator and Decision Optimizer
-<br>
-![Urza's Mine](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83314&type=card)
-![Urza's Tower](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83316&type=card)
-![Urza's Power Plant](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83315&type=card)
+
 <br>
 The Modern Tron deck relies on assembling Urza's Mine, Urza's Tower, and Urza's Power Plant in play as 
 early as possible. This combination, termed 'Tron', is ideally achieved by the third or fourth turn of the game.
+<br>
+
+![Urza's Mine](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83314&type=card)
+![Urza's Tower](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83316&type=card)
+![Urza's Power Plant](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83315&type=card)
 
 Because assembling this combination of lands is so important to the deck's functionality, players are incentivized 
 to mulligan hands that cannot assemble Tron within the first several turns. With the introduction of the [London mulligan](https://magic.wizards.com/en/articles/archive/competitive-gaming/mythic-championship-ii-format-and-london-test-2019-02-21), 
