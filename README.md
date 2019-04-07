@@ -2,10 +2,9 @@
 
 A *Magic the Gathering* Simulator and Decision Optimizer
 
-<br>
 The Modern Tron deck relies on assembling Urza's Mine, Urza's Tower, and Urza's Power Plant in play as 
 early as possible. This combination, termed 'Tron', is ideally achieved by the third or fourth turn of the game.
-<br>
+<br><br>
 
 ![Urza's Mine](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83314&type=card)
 ![Urza's Tower](http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=83316&type=card)
