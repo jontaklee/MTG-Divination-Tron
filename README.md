@@ -1,4 +1,4 @@
-# Divination - Tron
+# MTG Divination - Tron
 
 A *Magic the Gathering* Simulator and Decision Optimizer
 
