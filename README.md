@@ -16,19 +16,18 @@ Tron players are faced with potentially new optimal mulligan decisions.
 
 ### Mulligan for achieving a turn 3 Tron
 
-The mulligan_sim.py file starting hands using the London and [Paris mulligan](https://mtg.fandom.com/wiki/Paris_mulligan) rules.
-This program only takes into account starting hands that can guarantee assembling Tron by turn 3.
+Divination simulates starting hands using the London and [Paris mulligan](https://mtg.fandom.com/wiki/Paris_mulligan) rules.
+This aspect of the program only takes into account starting hands that can guarantee assembling Tron by turn 3.
 
 ### Optimal mulligan decisions when Tron is not guaranteed
 
 Determining whether to mulligan hands that do not immediately achieve Tron requires simulated games involving those starting hands.
 
-The vancouver.py script simulates playing until all three Tron lands are in play, and outputs the starting hand and turn when Tron was achieved. Methods for each card and the deck are found in the card_classes.py file.
-
-A Random Forest model trained on 50,000 simulated games are used to predict optimal hand selection for the London Mulligan. The model_turns.py script contains code to train the model. The london.py script chooses the best hand when taking a London mulligan.
+Divination simulates gameplay until all three Tron lands are in play, and outputs the starting hand and turn when Tron was achieved. A Random Forest model trained on 50,000 simulated games are used to predict optimal hand selection for the London Mulligan. 
 
 ### Summary:
-In progress.
+
+Under the Vancouver mulligan rule, taking mulligans until 3 card hands results in a guaranteed turn 3 Tron 36% of the time. In comparison, hands using the London mulligan rule guarantee turn 3 Tron 63% of the time. 
 
 
 <br><br>
