@@ -27,7 +27,7 @@ Divination simulates gameplay until all three Tron lands are in play, and output
 
 ### Summary:
 
-Under the Vancouver mulligan rule, taking mulligans until 3 card hands results in a guaranteed turn 3 Tron 36% of the time. In comparison, hands using the London mulligan rule guarantee turn 3 Tron 63% of the time, a. 
+Under the Vancouver mulligan rule, taking mulligans until 3 card hands results in a guaranteed turn 3 Tron 36% of the time. In comparison, hands using the London mulligan rule perform significantly better, guaranteeing turn 3 Tron 63% of the time. 
 
 These results are consistent with deck selections for the inaugural event for the London mulligan. Players were aware that the Tron deck performs more consistently under these rules, as evidenced by the deck having the [largest share of the metagame](https://magic.wizards.com/en/events/coverage/2019MC2/mythic-championship-ii-day-1-metagame-breakdown-2019-04-26).
 
