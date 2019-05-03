@@ -23,7 +23,7 @@ This aspect of the program only takes into account starting hands that can guara
 
 Determining whether to mulligan hands that do not immediately achieve Tron requires simulated games involving those starting hands.
 
-Divination simulates gameplay until all three Tron lands are in play, and outputs the starting hand and turn when Tron was achieved. A Random Forest model trained on 50,000 simulated games are used to predict optimal hand selection for the London Mulligan. 
+Divination simulates gameplay until all three Tron lands are in play, and outputs the starting hand and turn when Tron was achieved. A Random Forest model trained on 50,000 simulated games is used to predict optimal hand selection for the London Mulligan. 
 
 ### Summary:
 
