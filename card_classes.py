@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 v1.1
+#!/usr/bin/env python3 v1.2
 # -*- coding: utf-8 -*-
 """
 Classes for the Tron deck, and cards within the deck.
@@ -14,8 +14,8 @@ class MagicCard:
        self.name = name
        self.cmc = cmc
        self.card_type = card_type
-       self.colorless = colorless
-       self.gmc = gmc
+       self.colorless = colorless # boolean
+       self.gmc = gmc # green mana cost
        
 # class to specify Land cards
 class Land(MagicCard):
@@ -58,8 +58,8 @@ class AncientStirrings(MagicCard):
 
         # coded to prioritize achieving Tron over all else
         priority = ('Expedition Map', 'Chromatic Star', 'Chromatic Sphere', 
-                    'Forest', 'Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant',
-                    'Sanctum of Ugin', 'Ghost Quarter')
+                    'Forest', 'Urza\'s Tower', 'Urza\'s Mine', 
+                    'Urza\'s Power Plant','Sanctum of Ugin', 'Ghost Quarter')
         
         if len(temp) == 5:
             for name in priority:
@@ -81,7 +81,7 @@ class Chromatic(MagicCard):
     
     def __init__(self, name):
         self.name = name
-        self.amc = 1
+        self.amc = 1 # mana cost of activated ability
         MagicCard.__init__(self, name, 1, 'artifact', True, 0)
         
     def cast(self, hand, deck, bfield):
@@ -118,15 +118,15 @@ def tron_tutor(hand, deck, bfield):
     
     # determine which Tron lands are still needed
     tron_needed = list(tron_set.difference(set(bfield_names)))
-    hand_names = [card.name for card in hand]
+    hand_names = {card.name:0 for card in hand}
     
     # move a Tron land from deck to hand (only tutors Tron lands)
     for name in tron_needed:
         if name not in hand_names:
-            names_deck = [card.name for card in deck.deck]
-            
+            names_deck = {card.name:i for i, card in enumerate(deck.deck)}
+    
             # position of the card in the deck
-            card_pos = names_deck.index(name)
+            card_pos = names_deck[name]
             
             # add the selected card to hand
             hand.append(deck.deck[card_pos])
@@ -181,7 +181,7 @@ def decklist():
     ugin = MagicCard('Ugin, the Spirit Dragon', 8, 'planeswalker', True, 0)
     ulamog = MagicCard('Ulamog, the Ceaseless Hunger', 10, 'creature', True, 0)
     wurmcoil = MagicCard('Wurmcoil Engine', 6, 'creature', True, 0)
-    ballista = MagicCard('Walking Balista', 0, 'creature', True, 0)
+    ballista = MagicCard('Walking Ballista', 0, 'creature', True, 0)
     ostone = MagicCard('Oblivion Stone', 3, 'artifact', True, 0)
     
     emap = ExpMap()
