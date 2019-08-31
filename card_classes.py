@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 v1.2
+#!/usr/bin/env python3 v1.3
 # -*- coding: utf-8 -*-
 """
 Classes for the Tron deck, and cards within the deck.
@@ -54,7 +54,7 @@ class AncientStirrings(MagicCard):
                 break
 
         # selecting another card if no new Tron lands in top 5 cards
-        temp_names = [card.name for card in temp]
+        temp_names = {card.name:i for i, card in enumerate(temp)}
 
         # coded to prioritize achieving Tron over all else
         priority = ('Expedition Map', 'Chromatic Star', 'Chromatic Sphere', 
@@ -64,8 +64,8 @@ class AncientStirrings(MagicCard):
         if len(temp) == 5:
             for name in priority:
                 if name in temp_names:
-                    hand.append(temp[temp_names.index(name)])
-                    temp.pop(temp_names.index(name))
+                    hand.append(temp[temp_names[name]])
+                    temp.pop(temp_names[name])
                     break
                 
         # remove the top five cards of the deck
