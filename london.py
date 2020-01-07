@@ -4,6 +4,8 @@
 Simulate hands with the London mulligan rule
 Predicts expected turns to achieve Tron using a Random Forest model rather 
 than direct simulations
+
+version 2.0: updated for Once Upon a Time
 """
 from itertools import combinations 
 import numpy as np
@@ -40,10 +42,12 @@ def best_hand(handnames, handsize, on_draw, model):
 def expected_turns(on_draw):
     
     # this model is trained on hands that don't scry on mulligans
-    model = pickle.load(open('TronRandomForest_noscry.model', 'rb'))
+    model = pickle.load(open('ouat_scrying.model', 'rb'))
     avg_turns = []
+    all_preds = []
     
     for handsize in range(7, 2, -1):
+        #print('simulating {} card hands'.format(str(handsize)))
         preds = []
         for i in range(1000):
             library = TronDeck()
@@ -54,42 +58,17 @@ def expected_turns(on_draw):
         avg_output = (handsize, round(np.mean(preds), 2))
         print(avg_output)
         avg_turns.append(avg_output)
+        all_preds.append(preds)
     
     return avg_turns
-        
+    #return all_preds    
 
-# expected number of turns using vancouver rule:
-def expected_vancouver(on_draw):
-    
-    # this model is trained on hands with the Vancouver scry
-    model = pickle.load(open('TronRandomForest.model', 'rb'))
-    avg_turns = []
-    
-    for handsize in range(7, 2, -1):
-        preds = []
-        for i in range(1000):
-            library = TronDeck()
-            hand = library.draw_opener(handsize)
-            hand_in = ([card.name for card in hand],0)
-            df_hands = mtv.assemble_table([hand_in])
-            df_hands['play_draw'] = [int(on_draw)]    
-            df_hands = mtv.new_features(df_hands)
-            
-            X = df_hands.drop('turns', axis = 1).iloc[:, :(df_hands.shape[1]+1)].values
-            turn_pred = model.predict(X)
-            preds.append(turn_pred)
-        
-        avg_output = (handsize, round(np.mean(preds), 2))
-        print(avg_output)
-        avg_turns.append(avg_output)
-    
-    return avg_turns
 
 # helper function to run and save simulations
 def sim_london(on_draw):
     
     # this model is trained on hands that don't scry on mulligans
-    model = pickle.load(open('TronRandomForest_noscry.model', 'rb'))
+    model = pickle.load(open('ouat_scrying.model', 'rb'))
     output = []
     
     for handsize in range(7, 2, -1):
@@ -114,7 +93,7 @@ def create_sims_table():
     dfs = pd.Dataframe(sims_tot, columns = ['handsize', 'play_draw', 'pred'])
     dfs.to_csv('london_sims_RandomForest.csv', index = False)
 
-# helper function to process a user inputted hand
+# helper function to process a user input hand
 def input_hand():
     
     library = TronDeck()
@@ -151,7 +130,7 @@ def main():
     num_mull = int(input('How many times did you mulligan (0-4)? '))
     handsize = 7 - num_mull
     
-    model = pickle.load(open('TronRandomForest_noscry.model', 'rb'))
+    model = pickle.load(open('ouat_scrying.model', 'rb'))
     
     best = best_hand(handnames, handsize, on_draw, model)
     
@@ -169,4 +148,3 @@ def main():
 if __name__ == '__main__':
     main()
             
-

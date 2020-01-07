@@ -2,10 +2,21 @@
 # -*- coding: utf-8 -*-
 """
 Classes for the Tron deck, and cards within the deck.
+
+version 2.0: updated for Once Upon a Time
 """
 
-from random import shuffle
+import random
 
+# helper funtion to get names of cards in bfield
+def tron_check(bfield):
+    
+    bfield_names = {}
+    for card in bfield:
+        bfield_names[card.name] = bfield_names.get(card.name, 0) + 1
+    
+    tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
+    return tron_set.difference(bfield_names)
 
 # generic Magic Card class
 class MagicCard:
@@ -36,12 +47,9 @@ class AncientStirrings(MagicCard):
         MagicCard.__init__(self, 'Ancient Stirrings', 1, 'sorcery', False, 1)
 
     def cast(self, hand, deck, bfield):
-        
-        tron_set = set(['Urza\'s Tower', 'Urza\'s Mine', 'Urza\'s Power Plant'])
-        bfield_names = [card.name for card in bfield]
 
         # determine which lands are still needed for Tron
-        tron_needed = tron_set.difference(set(bfield_names))
+        tron_needed = tron_check(bfield)
         
         # look at the top five cards of the deck
         temp = deck.deck[:5]
@@ -54,7 +62,7 @@ class AncientStirrings(MagicCard):
                 break
 
         # selecting another card if no new Tron lands in top 5 cards
-        temp_names = {card.name:i for i, card in enumerate(temp)}
+        temp_names = {card.name:temp.index(card) for card in temp}
 
         # coded to prioritize achieving Tron over all else
         priority = ('Expedition Map', 'Chromatic Star', 'Chromatic Sphere', 
@@ -75,6 +83,52 @@ class AncientStirrings(MagicCard):
         deck.deck.extend(temp)
         
         hand.pop(hand.index(self))
+
+
+# class to simulate casting Once Upon a Time
+class OUaT(MagicCard):
+    
+    def __init__(self):
+        MagicCard.__init__(self, 'Once Upon a Time', 2, 'instant', False, 1)
+    
+    def cast(self, hand, deck, bfield):
+        
+        # determine which lands are still needed for Tron
+        tron_needed = tron_check(bfield)
+        
+        # look at the top five cards of the deck
+        temp = deck.deck[:5]
+        
+        # selects a Tron land to add to hand, if available
+        for card in temp:
+            if card.name in tron_needed and card not in hand:
+                hand.append(card)
+                temp.pop(temp.index(card))
+                break
+
+        # selecting another card if no new Tron lands in top 5 cards
+        temp_names = {card.name:temp.index(card) for card in temp}
+
+        # coded to prioritize achieving Tron over all else
+        priority = ('Forest', 'Urza\'s Tower', 'Urza\'s Mine', 
+                    'Urza\'s Power Plant','Sanctum of Ugin', 'Ghost Quarter')
+        
+        if len(temp) == 5:
+            for name in priority:
+                if name in temp_names:
+                    hand.append(temp[temp_names[name]])
+                    temp.pop(temp_names[name])
+                    break
+                
+        # remove the top five cards of the deck
+        del deck.deck[:5]
+        
+        # put the remaining cards on the bottom of the deck
+        deck.deck.extend(temp)
+        
+        hand.pop(hand.index(self))
+        
+        
         
 # class to simulate casting and activating Chromatic Star/Sphere
 class Chromatic(MagicCard):
@@ -187,17 +241,20 @@ def decklist():
     emap = ExpMap()
     stirrings = AncientStirrings()
     scrying = SylvanScrying()
+    ouat = OUaT()
     star = Chromatic('Chromatic Star')
     sphere = Chromatic('Chromatic Sphere')
     relic = Relic()
     
     tron_lands = [tower, mine, pplant]*4
     
-    quads = [karn, wurmcoil, ostone, emap, stirrings, scrying, star, sphere]*4
-    trips = [relic]*3
-    dups = [ulamog, ballista, ugin]*2
+    
+    quads = [karn, wurmcoil, ballista, emap, stirrings, scrying, star, ouat]*4
+    trips = [sphere, ostone]*3
+    dups = [ulamog, ballista, ugin]
     singles = [sanctum, gq]
-    forests = [forest]*5
+    forests = [forest]*4
+    
     
     return tron_lands + quads + trips + dups + singles + forests
 
@@ -210,7 +267,7 @@ class TronDeck:
     
     def shuffle(self):
         for i in range(0,5):
-            shuffle(self.deck)
+            random.shuffle(self.deck)
     
     # draw opening hand
     def draw_opener(self, handsize):

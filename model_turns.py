@@ -3,6 +3,8 @@
 """
 Train a Random Forest model to predict turns to achieve Tron, using data
 from simulated games
+
+version 2.0: updated for Once Upon a Time
 """
 
 from collections import Counter
@@ -11,7 +13,7 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-
+#import xgboost as xgb
 import vancouver as vc
 
 # simulates n*5 hands and saves to a list
@@ -38,7 +40,7 @@ def format_hand(hand):
                       'Forest', 'Ghost Quarter', 'Sanctum of Ugin',
                       'Chromatic Star', 'Chromatic Sphere', 
                       'Relic of Progenitus', 'Ancient Stirrings', 
-                      'Sylvan Scrying', 'Expedition Map']
+                      'Sylvan Scrying', 'Expedition Map', 'Once Upon a Time']
     
     counts = Counter(hand[0])
     
@@ -163,7 +165,7 @@ def prep_df(n):
 
 def train_random_forest(df):
     
-    y = df.iloc[:, 10].values
+    y = df.iloc[:, 11].values
     X = df.drop('turns', axis = 1).iloc[:, :(df.shape[1]+1)].values
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, 
@@ -192,6 +194,30 @@ def train_random_forest(df):
     '''
     return regressor
 
+'''
+def train_XGboost(df):
+    
+    y = df.iloc[:, 10].values
+    X = df.drop('turns', axis = 1).iloc[:, :(df.shape[1]+1)].values
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, 
+                                                    random_state = 0)  
+    
+    xg_reg = xgb.XGBRegressor(objective ='count:poisson', 
+                          colsample_bytree = 0.8, 
+                          learning_rate = 0.1, 
+                          min_child_weight = 5, 
+                          max_depth = 5, 
+                          alpha = 10, 
+                          n_estimators = 30,
+                          subsample = 0.8,
+                          gamma = 0.5)
+
+    xg_reg.fit(X_train,y_train)
+    
+    return xg_reg
+'''
+    
 
 # helper function for base prediction
 def predict_by_mean(df, means):
@@ -220,8 +246,10 @@ def base_prediction(df):
 def main():
     num_sims = 5000
     df = prep_df(num_sims)
+    #df.to_csv('tron_sims_noscry.csv', index = False)
     model = train_random_forest(df)
-    #outfile = 'TronRandomForest.model'
+    model = train_XGboost(df)
+    #outfile = 'TronXGboost.model'
     #pickle.dump(model, open(outfile, 'wb'))
     return model
 
