@@ -27,6 +27,8 @@ Divination simulates gameplay until all three Tron lands are in play, and output
 
 Update (1/6/2020): simulation now stops only when all tree Tron lands are in play and untapped
 
+Model report: *in progress*
+
 ### Summary:
 
 Under the Vancouver mulligan rule, taking mulligans until 3 card hands results in a guaranteed turn 3 Tron 36% of the time. In comparison, hands using the London mulligan rule perform significantly better, guaranteeing turn 3 Tron 63% of the time. 
